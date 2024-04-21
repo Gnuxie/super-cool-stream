@@ -1,12 +1,19 @@
 // SPDX-FileCopyrightText: 2022 - 2024 Gnuxie <Gnuxie@protonmail.com>
 //
 // SPDX-License-Identifier: Apache-2.0
+//
+// SPDX-FileAttributionText: <text>
+// This modified file incorporates work from super-cool-stream
+// https://github.com/Gnuxie/super-cool-stream
+// </text>
 
 export interface SuperCoolStream<Item, Sequence> {
   readonly source: Sequence;
   peekItem<EOF = undefined>(eof: EOF): Item | EOF;
   readItem<EOF = undefined>(eof: EOF): Item | EOF;
   getPosition(): number;
+  setPosition(n: number): void;
+  clone(): SuperCoolStream<Item, Sequence>;
   savingPositionIf<Result>(description: {
     predicate: (t: Result) => boolean;
     body: (stream: SuperCoolStream<Item, Sequence>) => Result;
@@ -45,6 +52,14 @@ export class StandardSuperCoolStream<Item, Sequence extends Indexable<Item>>
     return this.position;
   }
 
+  public setPosition(n: number) {
+    this.position = n;
+  }
+
+  public clone(): SuperCoolStream<Item, Sequence> {
+    return new StandardSuperCoolStream(this.source, this.position);
+  }
+
   savingPositionIf<Result>(description: {
     predicate: (t: Result) => boolean;
     body: (stream: SuperCoolStream<Item, Sequence>) => Result;
@@ -71,5 +86,65 @@ export class StringStream extends StandardSuperCoolStream<
 
   public readChar<EOF = undefined>(eof?: EOF) {
     return this.readItem(eof);
+  }
+
+  public clone(): StringStream {
+    return new StringStream(this.source, this.position);
+  }
+}
+
+/**
+ * Tracks columns and rows. Can't handle any other line ending than line feed atm.
+ */
+export class RowTrackingStringStream extends StringStream {
+  public constructor(
+    source: string,
+    position: number,
+    private row = 0,
+    private column = 0,
+  ) {
+    super(source, position);
+  }
+
+  public readItem<EOF = undefined>(eof?: EOF) {
+    const item = super.readItem(eof);
+    if (item === eof) {
+      return item;
+    } else if (item === "\n") {
+      this.row++;
+      this.column = 0;
+      return item;
+    } else {
+      this.column++;
+      return item;
+    }
+  }
+
+  public clone(): RowTrackingStringStream {
+    return new RowTrackingStringStream(
+      this.source as string,
+      this.position,
+      this.row,
+      this.column,
+    );
+  }
+  public get peekRow() {
+    return this.row;
+  }
+  public get peekColumn() {
+    return this.column;
+  }
+  public get readRow() {
+    return this.row - 1;
+  }
+  public get readColumn() {
+    if (this.row === 0) {
+      if ((this.column = 0)) {
+        return 0;
+      }
+      return this.column;
+    } else {
+      return this.column - 1;
+    }
   }
 }
