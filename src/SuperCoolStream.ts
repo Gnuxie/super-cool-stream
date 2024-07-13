@@ -35,7 +35,7 @@ export class StandardSuperCoolStream<Item, Sequence extends Indexable<Item>>
    */
   constructor(
     public readonly source: Sequence,
-    start = 0,
+    start = 0
   ) {
     this.position = start;
   }
@@ -101,7 +101,7 @@ export class RowTrackingStringStream extends StringStream {
     source: string,
     position: number,
     private row = 0,
-    private column = 0,
+    private column = 0
   ) {
     super(source, position);
   }
@@ -125,7 +125,7 @@ export class RowTrackingStringStream extends StringStream {
       this.source as string,
       this.position,
       this.row,
-      this.column,
+      this.column
     );
   }
   public get peekRow() {
@@ -139,7 +139,7 @@ export class RowTrackingStringStream extends StringStream {
   }
   public get readColumn() {
     if (this.row === 0) {
-      if ((this.column = 0)) {
+      if (this.column === 0) {
         return 0;
       }
       return this.column;
