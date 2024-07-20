@@ -9,8 +9,8 @@
 
 export interface SuperCoolStream<Item, Sequence> {
   readonly source: Sequence;
-  peekItem<EOF = undefined>(eof: EOF): Item | EOF;
-  readItem<EOF = undefined>(eof: EOF): Item | EOF;
+  peekItem<EOF = undefined>(eof?: EOF): Item | EOF;
+  readItem<EOF = undefined>(eof?: EOF): Item | EOF;
   getPosition(): number;
   setPosition(n: number): void;
   clone(): SuperCoolStream<Item, Sequence>;
