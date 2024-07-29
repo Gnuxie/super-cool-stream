@@ -18,7 +18,8 @@
   "private": false,
   "scripts": {
     "build": "rm -rf dist && yarn tsc --project tsconfig.json",
-    "lint": "yarn eslint && yarn prettier src --check"
+    "lint": "yarn eslint && yarn prettier src --check",
+    "prepare": "yarn build"
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",
