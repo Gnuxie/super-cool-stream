@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: CC0-1.0
 
-import { gnuxieEslint } from "gnuxie-tsconfig";
+import { gnuxieEslint } from "@gnuxie/tsconfig";
 
 export default [
     ...gnuxieEslint
